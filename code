@@ -1,14 +1,14 @@
 #1#
-######################################################################################################
-train_file=   'C:\\Users\\Aleksa\\Documents\\Desktop\\report\\Mappe1.csv'
-test_file=    'C:\\Users\\Aleksa\\Documents\\Desktop\\report\\Mappe2.csv'
+
+train_file=   'C:\\Users\\Aleksa\\Documents\\Desktop\\report\\TRAIN.csv'
+test_file=    'C:\\Users\\Aleksa\\Documents\\Desktop\\report\\TEST.csv'
 
 #date_column_name=  'TRADE DATE'
-columns=  ['AGGREGATION_UNIT','BOOK','TRADER']
-numerical_columns= [ 'PRICE','VOL']
+columns=  ['TRADE_COMPANY','TRADE_REASON','TRADER']
+numerical_columns= [ 'PRICE','VOLUME']
 coefficients= [0.01,0.02]
-A= 6
-dell=","
+threshold= 3
+delimiterr=","
 ######################################################################################################
 import os
 import pandas as pd 
@@ -17,13 +17,13 @@ import datetime
 import time
 import re
 import math
-#from scipy import stats
+
 pd.set_option('display.float_format', lambda x: '%.6f' % x)
 
 pd.set_option('display.max_columns', 50) 
 pd.set_option('display.max_rows', 1000) 
-df_train=pd.read_csv(train_file,delimiter=dell, encoding='latin_1', thousands='.',decimal=',', infer_datetime_format=True, dayfirst=True)
-df_test=pd.read_csv(test_file,delimiter=dell, encoding='latin_1', thousands='.',decimal=',', infer_datetime_format=True, dayfirst=True)
+df_train=pd.read_csv(train_file,delimiter=delimiterr, encoding='latin_1', thousands='.',decimal=',', infer_datetime_format=True, dayfirst=True)
+df_test=pd.read_csv(test_file,delimiter=delimiterr, encoding='latin_1', thousands='.',decimal=',', infer_datetime_format=True, dayfirst=True)
 df_train['T']='train'
 df_test['T']='test'
 df = pd.concat([df_train, df_test])
@@ -31,9 +31,8 @@ df = pd.concat([df_train, df_test])
 for i in numerical_columns:
     df[str(str(i)+'_original')]=df[i]
     df[i]=df[i]-min(df[i]-0.0001) # scale the minimum deal rate to zero
-
 #df[date_column_name]=pd.to_datetime(pd.Series(df[date_column_name]))#, format="%d-%m-%y")
-df1=df#.iloc[:,columns]
+df1=df
 
 #2#
 
@@ -60,9 +59,8 @@ for i in range (0, len(f)):
     elif f[i]=='bool':
         booleans.append(i)
         
-#df1a=df1.iloc[:,strings].astype(str)
+
 df1a=df1[columns]
-#df2=df2.reset_index(drop=True, inplace=True)
 df2=df1
 df2['group'] = df1a['group'] = df1a.values.sum(axis=1)
 
@@ -71,8 +69,6 @@ for i,j in zip(range(0,len(numerical_columns)),numerical_columns):
         df2[str(j)+'_data']=0
         df2[str(j)+'_limits']=0
 
-#df3=df2.loc[(df2[date_column_name]!=max(df2[date_column_name]))].sort_values(by='group')
-#df3_test=df2.loc[(df2[date_column_name]==max(df2[date_column_name]))].sort_values(by='group')
 
 df3=     df2.loc[(df2['T']=='train')]
 df3_test=df2.loc[(df2['T']=='test')]
@@ -108,7 +104,7 @@ for num,coeff in zip(numerical_columns, coefficients):
                         globals()[str('final_')+str(num)].append(globals()[str('datatotal_')+str(num)][i])
 
 
-                globals()[str('bins_')+str(num)] =[]  # create volume bins in the training set
+                globals()[str('bins_')+str(num)] =[]  
                 for i in globals()[str('data_')+str(num)]:
                     if i==0:
                          globals()[str('bins_')+str(num)].append(0)
@@ -120,7 +116,7 @@ for num,coeff in zip(numerical_columns, coefficients):
 
 
 
-                globals()[str('limits_')+str(num)]=[] #explicitely create volume bin limits in the training set
+                globals()[str('limits_')+str(num)]=[]
                 for i in globals()[str('data_')+str(num)]:
                     for t in range(0,len(globals()[str('final_')+str(num)])):
                         if i>=globals()[str('final_')+str(num)][t]:
@@ -135,9 +131,9 @@ for num,coeff in zip(numerical_columns, coefficients):
                 
                 
                 
-                globals()[str('data_test_')+str(num)]=df3_test.loc[(df3_test['group']==f), num] # repeat the process for test set, but using training set variable (final_vol)
+                globals()[str('data_test_')+str(num)]=df3_test.loc[(df3_test['group']==f), num] 
     
-                globals()[str('bins_test_')+str(num)] =[] #create volume bins in the test set (using unique volume values from the training set). This is how we avoid the potential anomalous test set values to polute our bin limits
+                globals()[str('bins_test_')+str(num)] =[] 
                 for i in globals()[str('data_test_')+str(num)]:
                     if i==0:
                         globals()[str('bins_test_')+str(num)].append(0)
@@ -147,17 +143,16 @@ for num,coeff in zip(numerical_columns, coefficients):
                                 if i<globals()[str('final_')+str(num)][t+1]:
                                     globals()[str('bins_test_')+str(num)].append(t)
 
-                globals()[str('limits_test_')+str(num)]=[] # explicitely create volume bin limits for the test set
+                globals()[str('limits_test_')+str(num)]=[] 
                 for i in globals()[str('data_test_')+str(num)]:
                      for t in range(0,len(globals()[str('final_')+str(num)])):
                         if i>=globals()[str('final_')+str(num)][t]:
                             if i<globals()[str('final_')+str(num)][t+1]:
                                 globals()[str('limits_test_')+str(num)].append(str([format(globals()[str('final_')+str(num)][t],'.2f'),format(globals()[str('final_')+str(num)][t+1],'.2f')]))
 
-                df3_test.loc[(df3_test['group']==f), str(num +'_bins')]  = globals()[str('bins_test_')+str(num)] # assign values to columns VOLUME_BINS, VOLUME_DATA, VOLUME_LIMITS in the test set
+                df3_test.loc[(df3_test['group']==f), str(num +'_bins')]  = globals()[str('bins_test_')+str(num)] 
                 df3_test.loc[(df3_test['group']==f), str(num +'_data')]  = globals()[str('data_test_')+str(num)]
                 df3_test.loc[(df3_test['group']==f), str(num +'_limits')]= globals()[str('limits_test_')+str(num)] 
-                
                 
 #4#
 df3['ONE']=1
@@ -171,12 +166,7 @@ for num in numerical_columns:
     
 df_final['CONC'] = df_final[cols].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
 df_final['CONC']=df_final['CONC'] +'_'+ df_final['group']
-#df_final['ONE']=1 
 df_final['FREQ'] = df_final.groupby('CONC').ONE.transform(np.sum) 
-
-#delta=(max(df_final[date_column_name])-min(df_final[date_column_name]))/np.timedelta64(1, 'D') # construct ued to create FREQ_adj column
-#df_final['adj']=1/np.exp(((((max(df_final[date_column_name])-df_final[date_column_name])/ np.timedelta64(1, 'D'))/delta)))
-#df_final['FREQ_adj'] = ((df_final.groupby('CONC').adj.transform(np.sum))+0.5).astype(int)
 
 df_final['group_count']=0
 for j in numerical_columns: 
@@ -185,44 +175,15 @@ for j in numerical_columns:
         for i in df3_test['group'].unique(): 
             df_final.loc[(df_final['group']==i), str(str(j)+ '_count')]=df_final.loc[(df_final['group']==i)].groupby(str(str(j)+ '_bins')).ONE.transform(np.sum)
             df_final.loc[(df_final['group']==i),'group_count']=df_final.loc[(df_final['group']==i)].groupby('group').ONE.transform(np.sum)
-            #print(i,j,z)
-#df_final
 
 #5#
-df_final['STATUS']="NA"
+df_test_final= df_final.loc[(df2['T']=='test')]
+df_test_final['STATUS']='OK'
 
-frases=[]
-def status(row): 
-    for g in counts:
-        if row[g] < A:            
-            frase=str( g + '_NOT_OK')
-            frases.append(frase)
-       
-        if row[g] < A & row['group_count']<A:
-            frase = 'group_count_NOT_OK'
-            frases.append(frase)
-        
-        if row['group_count']<A:
-            frase = 'group_count_NOT_OK'
-            frases.append(frase)
-            
-        if row['FREQ']<A:
-            frase = 'FREQUENCY_NOT_OK'
-            frases.append(frase)
-        else:
-            frase='OK'
-            frases.append(frase)
-
-    return(" ".join(frases))
-        
-#df_final['STATUS'] = df_final.loc[(df2[date_column_name]==max(df2[date_column_name]))].apply(status,axis=1)
-df_final['STATUS'] = df_final.loc[(df2['T']=='test')].apply(status,axis=1)
+df_test_final.loc[df_test_final['FREQ'] <threshold, ['STATUS']] = 'NOT OK'
 
 
-#from IPython.core.display import display, HTML # display final output
-#display(HTML("<style>.container { width:100% !important; }</style>"))
-#df_final_today=df_final.loc[df_final[date_column_name]== max(df_final[date_column_name])].sort_values(by='FREQ_adj', ascending=True)
-df_final_today=df_final.loc[df_final['T']== 'test'].sort_values(by='FREQ', ascending=True)
+df_test_final.sort_values(by='FREQ', ascending=True)
+print(df_test_final)
 
-#df_final_today
-print(df_final_today)
+
