@@ -24,7 +24,8 @@ The elements which the user needs to define are:
 
 Running the code with the provided TRAIN.csv and TEST.csv data will return the following results:
 
-  ....  CONC                                   FREQ      group_count   price_count  volume_vount  STATUS        
+  ....  CONC                                   FREQ      group_count   price_count  volume_count  STATUS  
+  
 0 ....  15_3_COMPANY_1HEDGE_TRADEEvan Black     7           27            7         8             OK  
 
 1 ....  19_3_COMPANY_1HEDGE_TRADEJohn Smith     5           44           11         5             OK  
@@ -36,7 +37,12 @@ Running the code with the provided TRAIN.csv and TEST.csv data will return the f
 4 ....  1_25_COMPANY_3DAILY_TRADEMatt Red        494        1779        1748         500          OK 
 
 
+The TEST set contains 5 entries and one of them is obviously anomalous. It is the third entry which also has status_NOT_OK.
+The FREQ of this anomalous row is zero, meaning that such entry does not exist in the TRAIN set. 
+The group_count column is zero meaning that the CONC = 0_0_COMPANY_3DAILY_TRADEALEX M does not exist in the TRAIN set. 
+Also, since our example has two numerical columns (PRICE and VOLUME), besides the group_count column the output will have columns price_count and volume_count. Values in these column are also zero, meaning that values for price and volume for this entry are very unusual. In fact if we open the TEST.csv file we can see that the price and volume for this entry are quite extreme values.
 
+The DAT tool therefore not only shows if an entry is anomalous, it points out which dimension of the record is anomalous (it could be the concatenation of categorical columns, one of the numerical columns, or both). When either of the "_count"  columns has a value below the defined threshold, the column status will equal 'NOT OK'
 
 
 
