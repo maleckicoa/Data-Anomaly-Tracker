@@ -1,1 +1,9 @@
-# Data-Anomaly-Tracking
+# Data Anomaly Tracker (DAT) is a tool for spoting anomalies in table data. 
+For example, if a company writes row-wise records into a database, the DAT will spot if one record is unique or has occured only seldom.
+
+This repository provides the python code for the DAT and two files TRAIN.csv and TEST.csv.
+TRAIN.csv is a table of 20000 records, these are trades made by one german energy company. The data is changed to avoid revealing any company information.
+
+The TRAIN.CSV table has multiple columns, not all of which are important. Therefore DAT requires that the relevant columns are defined by the user. Columns used in this example are 'TRADE_COMPANY','TRADE_REASON','TRADER','VOLUME' and 'PRICE'. The idea is that by combination of these features, a trade type can be defined. If a brand new type of trade occurs or a trade with wrong price or volume is entered in the database, the DAT will notice that the combination of values for the given columns is either unique or is lower than the threshold.
+
+From the technical point,the DAT does the following. For categorical columns the DAT builds one concatenated value (GROUP) for each row of the table. For all rows that share the same GROUP, the DAT will then take values from numerical columns (specified by the user) and build intervals (or bins) and assign each such bin a number. By design, every numerical value in the TRAIN set falls into one of the bins, threfore every numerical value is substituted with its bin number. Finally GROUP in each row is concatenated with these bin numbers. This final concatenation is reffered to as the CONC. For CONC in the TRAIN set every row we count how many times it has occured. In the last step we take the records from the TEST set and define a CONC for every row. We then count how mans times did a CONC from the TEST set occured in the TRAIN set
