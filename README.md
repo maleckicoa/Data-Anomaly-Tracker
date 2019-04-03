@@ -17,20 +17,19 @@ The elements which the user needs to define are:
 *the path to train_file  
 *the path to  test_file    
 *categorical columns - specify sensible columns whose unusual entries can be used to spot anomalous data
-*numerical_columns   - specify sensible columns whose unusual values can be used to spot anomalous data
-*coefficients        - used to build the bins around numerical columns (this values requires fine tuning and several executions before                          set correct)
-*threshold   - used to clasify a CONC as anomalous or normal.
-
+*numerical_columns - specify sensible columns whose unusual values can be used to spot anomalous data
+*coefficients - used to build the bins around numerical columns (this values requires fine tuning and several executions before set correct)
+*threshold - used to clasify a CONC as anomalous or normal.
 *date_column_name - can be used optinaly to extend the tool for temporal data
 
 Running the code with the provided TRAIN.csv and TEST.csv data will return the following results:
 
-                                  CONC        FREQ  group_count  PRICE_count   VOLUME_count  STATUS 
-0 ....  15_3_COMPANY_1HEDGE_TRADEEvan Black     7           27            7     8             OK  
-1 ....  19_3_COMPANY_1HEDGE_TRADEJohn Smith     5           44           11     5             OK  
-2 ....       0_0_COMPANY_3DAILY_TRADEALEX M     0            0            0     0             NOT OK
-3 ....    1_23_COMPANY_3DAILY_TRADEMatt Red   312         1779         1748     312           OK
-4 ....    1_25_COMPANY_3DAILY_TRADEMatt Red   494         1779         1748     500           OK 
+0 ....  CONC                                   FREQ      group_count   price_count  volume_vount  STATUS        
+0 ....  15_3_COMPANY_1HEDGE_TRADEEvan Black     7           27            7         8             OK  
+1 ....  19_3_COMPANY_1HEDGE_TRADEJohn Smith     5           44           11         5             OK  
+2 ....       0_0_COMPANY_3DAILY_TRADEALEX M     0            0            0         0             NOT OK
+3 ....    1_23_COMPANY_3DAILY_TRADEMatt Red   312         1779         1748         312           OK
+4 ....    1_25_COMPANY_3DAILY_TRADEMatt Red   494         1779         1748         500           OK 
 
 
 
